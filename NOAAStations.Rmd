@@ -54,7 +54,7 @@ Here are some lessons learned about using leaflet to show maps.  The dataset con
 Due to the large number of records, the clusterOptions will be used to render the page faster.  The loading time for the dataset takes approximately 2 to 3 minutes to load the dataframe.  Creating the dataframe in memory before loading the data was the fastest time to loading the data into the dataframe.
 
 ## NOAA Weather Stations in the United States
-Click on the clusters to view the pins.  Each pin will display the state and station name.  To see an io slide version click on this link: "https://markspoto.github.io/NOAAStationsMarkdown/NOAAStationsSlides.Rmd""
+Click on the clusters to view the pins.  Each pin will display the state and station name.  To see an io slide version click on this link: "https://markspoto.github.io/NOAAStationsMarkdown/NOAAStationsSlides.html"
 
 ```{r echo=FALSE, warning=FALSE}
 trim <- function(x) gsub("^\\s+|\\s+$", "", x)
