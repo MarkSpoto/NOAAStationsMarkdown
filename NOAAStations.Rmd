@@ -53,10 +53,10 @@ Here are some lessons learned about using leaflet to show maps.  The dataset con
 
 Due to the large number of records, the clusterOptions will be used to render the page faster.  The loading time for the dataset takes approximately 2 to 3 minutes to load the dataframe.  Creating the dataframe in memory before loading the data was the fastest time to loading the data into the dataframe.
 
-## NOAA Weather Stations in the United States
-Click on the clusters to view the pins.  Each pin will display the state and station name.  To see an io slide version click on this link: "https://markspoto.github.io/NOAAStationsMarkdown/NOAAStationsSlides.html"
+### Code used to generate the map
+This section is shown for learning purposes.  Below, the code will load the data from the NOAA stations file.  The next section will show how to display the map.
 
-```{r echo=FALSE, warning=FALSE}
+```{r echo=TRUE, warning=FALSE, cache=TRUE}
 trim <- function(x) gsub("^\\s+|\\s+$", "", x)
 
 n <- totalUSStations
@@ -77,7 +77,11 @@ for (i in 1:length(data)) {
   }
 }
 close(con)
+```
+## NOAA Weather Stations in the United States
+Click on the clusters to view the pins.  Each pin will display the state and station name.  To see an io slide version click on this link: "https://markspoto.github.io/NOAAStationsMarkdown/NOAAStationsSlides.html"
 
+```{r echo=TRUE, warning=FALSE}
 stationpopup <- df[,c("desc")]
 df[,c("lat","lng")] %>% 
   leaflet() %>% 
