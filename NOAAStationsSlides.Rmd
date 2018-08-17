@@ -1,0 +1,84 @@
+---
+title: "NOAA Weather Stations in United States using leaflet"
+author: "Mark S Spoto"
+date: "August 17, 2018"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+packages <- c("lubridate", "dplyr", "ggplot2", "RColorBrewer", "mice", "VIM", "grid", "gridExtra","leaflet")
+if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
+  install.packages(setdiff(packages, rownames(installed.packages())), repos = "http://cran.us.r-project.org")  
+}
+
+library(leaflet)
+library(dplyr)
+```
+
+## Introduction
+
+This presentation will show all the NOAA Weather Stations througout the United States using leaflet.  Below is a list of weather
+stations from ["https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/ghcnd-stations.txt"].  Below are the file definitions.
+
+Variable  | Columns | Type
+--------- | ------- | ---------  
+ID        | 1-11    | Character  
+LATITUDE  | 13-20   | Real  
+LONGITUDE | 22-30   | Real  
+ELEVATION | 32-37   | Real  
+STATE     | 39-40   | Character  
+NAME      | 42-71   | Character  
+GSN FLAG  | 73-75   | Character  
+HCN/CRN FLAG | 77-79 |Character  
+WMO ID       | 81-85 | Character
+
+```{r, echo=FALSE}
+totalUSStations <- 0
+con = file("./stations.txt", "r")
+data <- readLines(con)
+for (i in 1:length(data)) {
+  if (startsWith(data[i], "US")) {
+    totalUSStations <- totalUSStations + 1
+  }
+}
+close(con)
+```
+
+### Key Notes about the Map
+Here are some lessons learned about using leaflet to show maps.  The dataset contains over 100 thousand locations througout the world.  This presentation will only use the stations found in the United States which is approximately `r format(totalUSStations, scientific=FALSE, big.mark=",")`.
+
+Due to the large number of records, the clusterOptions will be used to render the page faster.  The loading time for the dataset takes approximately 2 to 3 minutes to load the dataframe.  Creating the dataframe in memory before loading the data was the fastest time to loading the data into the dataframe.
+
+## NOAA Weather Stations in the United States
+```{r echo=FALSE, warning=FALSE}
+trim <- function(x) gsub("^\\s+|\\s+$", "", x)
+
+n <- totalUSStations
+idx <- 1
+df = data.frame(id = character(n), lat = numeric(n), lng = numeric(n), st = character(n), name = character(n), desc = character(n), stringsAsFactors = FALSE)
+con = file("./stations.txt", "r")
+data <- readLines(con)
+for (i in 1:length(data)) {
+  if (startsWith(data[i], "US")) {
+    s = data[i]
+    df$id[idx] <- substr(s, 1, 11)
+    df$lat[idx] <- as.numeric(substr(s, 13, 20))
+    df$lng[idx] <- as.numeric(substr(s, 22, 30))
+    df$st[idx] <- substr(s, 39, 40)
+    df$name[idx] <- trim(substr(s, 42, 71))
+    df$desc[idx] <- paste("State:", df$st[idx], " Station:", df$name[idx])
+    idx = idx + 1
+  }
+}
+close(con)
+
+stationpopup <- df[,c("desc")]
+df[,c("lat","lng")] %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addMarkers(popup = stationpopup, clusterOptions = markerClusterOptions())
+```
